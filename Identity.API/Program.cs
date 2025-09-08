@@ -17,6 +17,15 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(op => { op.User.RequireUniqu
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<TokenService>();
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("all", corsPolicyBuilder => corsPolicyBuilder
+        .AllowAnyHeader()
+        .AllowAnyOrigin()
+        .AllowAnyMethod());
+});
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -30,7 +39,7 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT",
         Scheme = "bearer"
     });
-        
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -55,6 +64,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("all");
