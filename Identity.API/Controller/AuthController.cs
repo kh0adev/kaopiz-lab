@@ -13,7 +13,7 @@ public class AuthController(
     UserManager<AppUser> userManager,
     SignInManager<AppUser> signInManager,
     TokenService tokenService,
-    HttpContextAccessor contextAccessor)
+    IHttpContextAccessor contextAccessor)
     : ControllerBase
 {
     [HttpPost("register")]

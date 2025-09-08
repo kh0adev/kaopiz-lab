@@ -50,7 +50,7 @@ public class TokenService(
         var token = GenerateRefreshToken();
         context.RefreshTokens.Add(new RefreshToken()
         {
-            UserId = user.Id,
+            AppUserId = user.Id,
             Token = token,
             ExpiryTime = DateTime.Now.AddDays(7),
         });
@@ -58,10 +58,10 @@ public class TokenService(
         context.SaveChanges();
         return token;
     }
-    
+
     public string RefreshRefreshToken(string userId)
     {
-        var existedToken = context.RefreshTokens.Where(t => t.UserId == userId);
+        var existedToken = context.RefreshTokens.Where(t => t.AppUserId == userId);
         if (existedToken.Any())
         {
             context.RefreshTokens.RemoveRange(existedToken);
@@ -70,7 +70,7 @@ public class TokenService(
         var token = GenerateRefreshToken();
         context.RefreshTokens.Add(new RefreshToken()
         {
-            UserId = userId,
+            AppUserId = userId,
             Token = token,
             ExpiryTime = DateTime.Now.AddDays(7),
         });
@@ -86,7 +86,8 @@ public class TokenService(
 
     public async Task<RefreshToken> RefreshToken(string token)
     {
-        var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(t => t.Token == token);
+        var refreshToken =
+            await context.RefreshTokens.Include(x => x.AppUser).FirstOrDefaultAsync(t => t.Token == token);
         if (refreshToken is not null)
         {
             return refreshToken;
@@ -97,7 +98,7 @@ public class TokenService(
 
     public async Task RevokeRefreshToken(string userId)
     {
-        var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(t => t.UserId == userId);
+        var refreshToken = await context.RefreshTokens.FirstOrDefaultAsync(t => t.AppUserId == userId);
         if (refreshToken is not null)
         {
             context.RefreshTokens.Remove(refreshToken);
