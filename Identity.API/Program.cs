@@ -1,6 +1,7 @@
 using Identity.API.Data;
 using Identity.API.Data.Model;
 using Identity.API.Service;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -17,14 +18,27 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(op => { op.User.RequireUniqu
     .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<TokenService>();
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.Name = "App.Identity";
+    options.LoginPath = "/login";
+    options.LogoutPath = "/Identity/Logout";
+    options.AccessDeniedPath = "/";
+});
+
 
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("all", corsPolicyBuilder => corsPolicyBuilder
+        .WithOrigins(
+            "https://kaopiz-client.vercel.app")
         .AllowAnyHeader()
-        .AllowAnyOrigin()
-        .AllowAnyMethod());
+        .AllowAnyMethod()
+        .AllowCredentials());
 });
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

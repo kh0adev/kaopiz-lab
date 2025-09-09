@@ -62,21 +62,19 @@ public class AuthController(
             return Unauthorized(new { message = "Invalid login attempt" });
         }
 
-        var refreshToken = string.Empty;
         if (request.RememberMe)
         {
-            refreshToken = tokenService.CreateRefreshToken(user);
+            var refreshToken = tokenService.CreateRefreshToken(user);
+            Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddDays(7)
+            });
         }
 
         var token = await tokenService.GenerateAccessToken(user);
-
-        Response.Cookies.Append("refresh_token", refreshToken, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddDays(7)
-        });
 
         return Ok(new { token });
     }
@@ -100,7 +98,7 @@ public class AuthController(
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(7)
             });
             return Ok(new { newAccessToken });
