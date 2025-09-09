@@ -123,7 +123,7 @@ public class AuthController(
         var user = await userManager.FindByIdAsync(GetCurrentUserId());
         if (user is not null)
         {
-            return Ok(user);
+            return Ok(new { UserName = user.UserName});
         }
         
         return NotFound();
