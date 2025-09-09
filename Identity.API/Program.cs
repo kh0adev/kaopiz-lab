@@ -35,7 +35,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("all", corsPolicyBuilder => corsPolicyBuilder
         .WithOrigins(
-            "https://kaopiz-client.vercel.app")
+            "https://kaopiz-client.vercel.app", "https://kaopiz-client-git-main-trn-djang-khoas-projects-dbe239e6.vercel.app")
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials());
